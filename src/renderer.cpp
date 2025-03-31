@@ -84,7 +84,10 @@ void Renderer::render(const World& world, const Camera& camera, Screen& screen) 
 
     for (const auto& triangle : world) {
         auto transformed = triangle.transform(camera.getWorldToClip());
-        drawTriangle(transformed, screen);
+        auto clipped = camera.clipTriangle(transformed);
+        for (const auto& clipped_triangle : clipped) {
+            drawTriangle(clipped_triangle, screen);
+        }
     }
 }
 
