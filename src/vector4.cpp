@@ -2,33 +2,41 @@
 
 namespace renderer {
 
-Vector4::Vector4() : glm::dvec4(0.0, 0.0, 0.0, 1.0) {
+Vector4::Vector4() : vec(0.0f, 0.0f, 0.0f, 1.0f) {
 }
 
-Vector4::Vector4(double x, double y, double z, double w) : glm::dvec4(x, y, z, w) {
+Vector4::Vector4(float x, float y, float z, float w) : vec(x, y, z, w) {
 }
 
-Vector4::Vector4(const glm::dvec4& v) : glm::dvec4(v) {
+Vector4::Vector4(const glm::vec4& vec) : vec(vec) {
+}
+
+Vector4::operator const glm::vec4&() const {
+    return vec;
+}
+
+Vector4::operator glm::vec4() const {
+    return vec;
 }
 
 Vector4 Vector4::operator+(const Vector4& other) const {
-    return Vector4(x + other.x, y + other.y, z + other.z, w + other.w);
+    return Vector4(vec + other.vec);
 }
 
 Vector4 Vector4::operator-(const Vector4& other) const {
-    return Vector4(x - other.x, y - other.y, z - other.z, w - other.w);
+    return Vector4(vec - other.vec);
 }
 
-Vector4 Vector4::operator*(double alpha) const {
-    return Vector4(x * alpha, y * alpha, z * alpha, w * alpha);
+Vector4 Vector4::operator*(float alpha) const {
+    return Vector4(vec * alpha);
 }
 
-Vector4 Vector4::operator/(double alpha) const {
-    return Vector4(x / alpha, y / alpha, z / alpha, w / alpha);
+Vector4 Vector4::operator/(float alpha) const {
+    return Vector4(vec / alpha);
 }
 
 bool Vector4::operator==(const Vector4& other) const {
-    return glm::all(glm::equal(*this, other));
+    return glm::all(glm::equal(vec, other.vec));
 }
 
 bool Vector4::operator!=(const Vector4& other) const {
@@ -36,13 +44,33 @@ bool Vector4::operator!=(const Vector4& other) const {
 }
 
 Vector4 Vector4::normalize() const {
-    if (w == 0.0)
+    if (vec.w == 0.0f)
         return *this;
-    return Vector4(x / w, y / w, z / w, 1.0);
+    return Vector4(vec.x / vec.w, vec.y / vec.w, vec.z / vec.w, 1.0f);
 }
 
-double Vector4::length() const {
-    return std::sqrt(x * x + y * y + z * z);
+Vector3 Vector4::toVector3() const {
+    if (vec.w != 0.0f)
+        return Vector3{vec.x / vec.w, vec.y / vec.w, vec.z / vec.w};
+    else
+        return Vector3{vec.x, vec.y, vec.z};
+}
+
+float Vector4::length() const {
+    return glm::length(glm::vec3(vec));
+}
+
+float Vector4::x() const {
+    return vec.x;
+}
+float Vector4::y() const {
+    return vec.y;
+}
+float Vector4::z() const {
+    return vec.z;
+}
+float Vector4::w() const {
+    return vec.w;
 }
 
 }  // namespace renderer

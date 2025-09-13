@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "linear_algebra.h"
 #include "triangle.h"
 
 namespace renderer {
@@ -12,12 +13,12 @@ private:
     std::vector<Triangle> triangles_;
 
 public:
-    explicit Object(std::vector<Triangle> tris);
+    explicit Object(std::vector<Triangle>&& triangles);
 
-    void move(const glm::mat4& transformation);
-    void rotate(const glm::mat4& rotation);
+    void move(const Matrix4& transformation);
+    void rotate(const Matrix4& rotation);
 
-    const std::vector<Triangle>& getTriangles() const&;
+    const std::vector<Triangle>& getTriangles() const;
 };
 
 }  // namespace renderer

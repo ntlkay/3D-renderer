@@ -3,9 +3,12 @@
 #include <algorithm>
 #include <glm/glm.hpp>
 
+#include "linear_algebra.h"
 #include "vertex.h"
 
 namespace renderer {
+
+using iterator = std::array<Vertex, 3>::const_iterator;
 
 class Triangle {
 private:
@@ -14,17 +17,18 @@ private:
 public:
     Triangle(const Vertex& v1, const Vertex& v2, const Vertex& v3);
 
-    Triangle transform(const glm::mat4& matrix) const;
+    void transform(const Matrix4& matrix);
 
-    const Vertex& operator[](size_t index) const;
+    const Vertex& GetVertex(unsigned int index) const;
 
     const std::array<Vertex, 3>& getVertices() const;
     std::array<Vector4, 3> getPositions() const;
+    std::array<Vector4, 3> getNormals() const;
 
-    std::array<Vertex, 3>::iterator begin();
-    std::array<Vertex, 3>::iterator end();
-    std::array<Vertex, 3>::const_iterator begin() const;
-    std::array<Vertex, 3>::const_iterator end() const;
+    iterator begin();
+    iterator end();
+    iterator begin() const;
+    iterator end() const;
 };
 
 }  // namespace renderer

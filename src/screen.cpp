@@ -2,38 +2,57 @@
 
 namespace renderer {
 
-Screen::Screen(unsigned int w, unsigned int h) : width_(w), height_(h) {
-    pixels_.resize(width_ * height_);
-    z_buffer_.resize(width_ * height_, std::numeric_limits<double>::max());
-    clear();
+float& Screen::zBuffer(unsigned int x, unsigned int y) {
+    return z_buffer_[y * width_ + x];
 }
 
-void Screen::clear() {
-    std::fill(pixels_.begin(), pixels_.end(), sf::Vertex(sf::Vector2f(0, 0), sf::Color::Black));
-    std::fill(z_buffer_.begin(), z_buffer_.end(), std::numeric_limits<double>::max());
+float Screen::zBuffer(unsigned int x, unsigned int y) const {
+    return z_buffer_[y * width_ + x];
 }
 
-void Screen::setPixel(unsigned int x, unsigned int y, double z, const sf::Color& color) {
-    if (x >= width_ || y >= height_)
-        return;
-
-    const size_t index = y * width_ + x;
-    if (z < z_buffer_[index]) {
-        z_buffer_[index] = z;
-        pixels_[index] = sf::Vertex(sf::Vector2f(x, y), color);
+Screen::Screen(Width width, Height height)
+    : width_(width), pixels_(width * height), z_buffer_(width * height, kBufferDefaultValue) {
+    for (int i = 0; i < width * height; ++i) {
+        pixels_[i].position = sf::Vector2f(i % width, i / width);
+        pixels_[i].color = sf::Color::Black;
     }
+}
+
+void Screen::fill(const sf::Color& color) {
+    std::fill(z_buffer_.begin(), z_buffer_.end(), kBufferDefaultValue);
+    for (auto& pixel : pixels_) {
+        pixel.color = color;
+    }
+}
+
+void Screen::setPixel(int x, int y, double z, const sf::Color& color) {
+    if (x >= width_ || y >= getHeight()) {
+        return;
+    }
+
+    if (z < zBuffer(x, y)) {
+        zBuffer(x, y) = z;
+        pixels_[y * width_ + x].color = color;
+    }
+}
+
+void Screen::draw(sf::RenderWindow& window) const {
+    window.draw(pixels_.data(), pixels_.size(), sf::PrimitiveType::Points);
 }
 
 const std::vector<sf::Vertex>& Screen::getPixels() const {
     return pixels_;
 }
 
-unsigned int Screen::getWidth() const {
+int Screen::getWidth() const {
     return width_;
 }
 
-unsigned int Screen::getHeight() const {
-    return height_;
+int Screen::getHeight() const {
+    if (width_ == 0) {
+        return 0;
+    }
+    return pixels_.size() / width_;
 }
 
 }  // namespace renderer

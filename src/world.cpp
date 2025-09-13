@@ -2,41 +2,42 @@
 
 namespace renderer {
 
-void World::addObject(Object obj) {
-    objects_.push_back(std::move(obj));
+void World::addObject(Object&& object) {
+    objects_.push_back(std::move(object));
 }
 
-void World::addCamera(const Camera cam) {
-    cameras_.push_back(cam);
+void World::addCamera(Camera&& camera) {
+    cameras_.push_back(std::move(camera));
 }
 
-std::vector<Object> World::getObjects() const {
+const std::vector<Object>& World::getObjects() const {
     return objects_;
 }
 
-std::vector<Camera> World::getCameras() const {
+const std::vector<Camera>& World::getCameras() const {
     return cameras_;
 }
 
-World::PrimitiveIterator::PrimitiveIterator(const World& w, size_t oi, size_t ti)
-    : world_(w), objIndex_(oi), triIndex_(ti) {
+World::PrimitiveIterator::PrimitiveIterator(const World& world, unsigned int object_index,
+                                            unsigned int triangle_index)
+    : world_(std::cref(world)), object_index_(object_index), triangle_index_(triangle_index) {
 }
 
 const Triangle& World::PrimitiveIterator::operator*() const {
-    return world_.objects_[objIndex_].getTriangles()[triIndex_];
+    return world_.get().objects_[object_index_].getTriangles()[triangle_index_];
 }
 
 World::PrimitiveIterator& World::PrimitiveIterator::operator++() {
-    ++triIndex_;
-    if (triIndex_ >= world_.objects_[objIndex_].getTriangles().size()) {
-        triIndex_ = 0;
-        ++objIndex_;
+    ++triangle_index_;
+    if (triangle_index_ >= world_.get().objects_[object_index_].getTriangles().size()) {
+        triangle_index_ = 0;
+        ++object_index_;
     }
     return *this;
 }
 
 bool World::PrimitiveIterator::operator==(const PrimitiveIterator& other) const {
-    return objIndex_ == other.objIndex_ && triIndex_ == other.triIndex_;
+    return object_index_ == other.object_index_ && triangle_index_ == other.triangle_index_;
 }
 
 bool World::PrimitiveIterator::operator!=(const PrimitiveIterator& other) const {

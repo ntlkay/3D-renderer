@@ -6,23 +6,31 @@
 
 namespace renderer {
 
+enum Width : int;
+enum Height : int;
+
 class Screen {
 private:
-    unsigned int width_;
-    unsigned int height_;
+    static constexpr float kBufferDefaultValue = std::numeric_limits<float>::max();
+
+    int width_;
     std::vector<sf::Vertex> pixels_;
     std::vector<float> z_buffer_;
 
-public:
-    Screen(unsigned int w, unsigned int h);
+    float& zBuffer(unsigned int x, unsigned int y);
+    float zBuffer(unsigned int x, unsigned int y) const;
 
-    void clear();
-    void setPixel(unsigned int x, unsigned int y, double z, const sf::Color& color);
+public:
+    Screen(Width width, Height height);
+
+    void fill(const sf::Color& color);
+    void setPixel(int x, int y, double z, const sf::Color& color);
+    void draw(sf::RenderWindow& window) const;
 
     const std::vector<sf::Vertex>& getPixels() const;
 
-    unsigned int getWidth() const;
-    unsigned int getHeight() const;
+    int getWidth() const;
+    int getHeight() const;
 };
 
 }  // namespace renderer

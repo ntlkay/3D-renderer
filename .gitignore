@@ -34,3 +34,5 @@
 *.sh
 codik.txt
 build
+.editorconfig
+.vscode
